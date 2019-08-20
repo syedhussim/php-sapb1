@@ -58,3 +58,42 @@ Depending on the service, `$id` may be a numeric value or a string. If you want 
 ...
 $meta = $orders->getMetaData();
 ```
+
+### Creating A Service
+
+The following code sample shows how to create a new Sales Order using the create() method of the Service object.
+
+```php
+...
+$orders = $sap->getService('Orders');
+
+$result = $orders->create([
+    'CardCode' => 'BP Card Code',
+    'DocDueDate' => 'Doc due date',
+    'DocumentLines' => [
+        [
+            "ItemCode" => "Item Code",
+            "Quantity" => 100,
+        ]
+    ]
+]);
+```
+You must provide any User Defined Fields that are required to create a Sales Order. If successful, the newly created Sales Order will be returned as an object.
+
+### Updating A Service
+
+The following code sample demonstrates how to update a service using the `update()` method of the Service object.
+
+```php
+...
+$sap = SAPClient::createSession($config, 'manager', 'harshal', 'TEST_SADP');
+
+$orders = $sap->getService('Orders');
+
+$result = $orders->update(19925, [
+    'Comments' => 'Comment added here'
+]);
+```
+Note that the first argument to the update() method is the `id` of the entity to update. In the case of a Sales Order the `id` is the DocEntry field. If the update is successful a boolean true value is returned.
+
+You can find more examples and the full documentation at https://syedhussim.com/sap-b1/php-sapb1-library-documentation-v1.html

@@ -153,7 +153,7 @@ class Service{
         return $meta;
     }
     
-    private function doRequest($method, $postData, $action = '') : Response{ print $this->config->getServiceUrl($this->serviceName) . $action; //exit;
+    private function doRequest($method, $postData, $action = '') : Response{
         $request = new Request($this->config->getServiceUrl($this->serviceName) . $action, $this->config->getSSLOptions());
         $request->setMethod($method);
         $request->setCookies($this->session);
