@@ -6,6 +6,9 @@ class SAPException extends \Exception{
     
     protected $statusCode;
     
+    /**
+     * Initializes a new instance of SAPException.
+     */
     public function __construct(Response $response){
         $this->statusCode = $response->getStatusCode();
         $message = '';

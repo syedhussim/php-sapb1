@@ -3,10 +3,7 @@
 namespace SAPb1;
 
 /**
- * Class Service
- *
  * Service class contains methods to perform CRUD actions on a service.
- *
  */
 class Service{
     
@@ -16,10 +13,6 @@ class Service{
     
     /**
      * Initializes a new instance of Service.
-     *
-     * @param Config $configOptions
-     * @param array $session
-     * @param string $serviceName
      */
     public function __construct(Config $configOptions, array $session, string $serviceName){
         $this->config = $configOptions;
@@ -30,9 +23,6 @@ class Service{
     /**
      * Creates an entity. Returns the newly created entity on success.
      * Throws SAPb1\SAPException if an error occurred.
-     *
-     * @param array $data
-     * @return object
      */
     public function create(array $data) : object{
         
@@ -48,10 +38,6 @@ class Service{
     /**
      * Updates an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
-     *
-     * @param int|string $id
-     * @param array $data
-     * @return boolean
      */
     public function update($id, array $data) : bool{
         
@@ -71,9 +57,6 @@ class Service{
     /**
      * Deletes an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
-     *
-     * @param int|string $id
-     * @return boolean
      */
     public function delete($id) : bool{
         
@@ -81,7 +64,7 @@ class Service{
             $id = "'" . str_replace("'", "''", $id) . "'";
         }
 
-        $response = $this->doRequest('DELETE');
+        $response = $this->doRequest('DELETE', '(' . $id . ')');
 
         if($response->getStatusCode() === 204){
             return true;
@@ -93,10 +76,6 @@ class Service{
     /**
      * Performs an action on an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
-     *
-     * @param int|string $id
-     * @param string $action
-     * @return boolean
      */
     public function action($id, string $action) : bool{
         
@@ -104,7 +83,7 @@ class Service{
             $id = "'" . str_replace("'", "''", $id) . "'";
         }
 
-        $response = $this->doRequest('POST', [], $action);
+        $response = $this->doRequest('POST', null, '(' . $id . ')/' . $action);
 
         if($response->getStatusCode() === 204){
             return true;
@@ -115,19 +94,71 @@ class Service{
     
     /**
      * Returns a new instance of SAPb1\Query.
-     *
-     * @return Query
      */
     public function queryBuilder() : Query{
         return new Query($this->config, $this->session, $this->serviceName);
     }
     
-    private function doRequest($method, $postData, $action = '') : Response{
+    /**
+     * Returns metadata for the service.
+     */
+    public function getMetaData() : array{
+        $request = new Request($this->config->getServiceUrl('$metadata'), $this->config->getSSLOptions());
+        $request->setMethod('GET');
+        $request->setCookies($this->session);
+        $response = $request->getResponse(); 
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($response->getBody());
+        
+        $entitySetList = $dom->getElementsByTagName('EntityContainer')[0]->getElementsByTagName('EntitySet');
+        
+        $meta = [];
+        
+        foreach($entitySetList as $entitySet){
+            if($entitySet->getAttribute('Name') == $this->serviceName){
+                $entityType = $entitySet->getAttribute('EntityType');
+                
+                $array = explode('.', $entityType);
+                
+                $entityTypeList = $dom->getElementsByTagName('EntityType');
+
+                foreach($entityTypeList as $entityType){
+                    if($entityType->getAttribute('Name') == $array[1]){
+                        $key = $entityType->getElementsByTagName('PropertyRef');
+                        
+                        if($key->length > 0){
+                            $meta['key'] = $key[0]->getAttribute('Name');
+                        }
+                        
+                        $properties = $entityType->getElementsByTagName('Property');
+                        
+                        foreach($properties as $property){
+                            $name = $property->getAttribute('Name');
+                            $meta['properties'][] = $name;
+                        }
+                        
+                        $navProperties = $entityType->getElementsByTagName('NavigationProperty');
+                        
+                        foreach($navProperties as $property){
+                            $name = $property->getAttribute('Name');
+                            $meta['navigation'][] = $name;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        
+        return $meta;
+    }
+    
+    private function doRequest($method, $postData, $action = '') : Response{ print $this->config->getServiceUrl($this->serviceName) . $action; //exit;
         $request = new Request($this->config->getServiceUrl($this->serviceName) . $action, $this->config->getSSLOptions());
         $request->setMethod($method);
         $request->setCookies($this->session);
         $request->setPost($postData);
-        
+
         return $request->getResponse();
     }
 }
