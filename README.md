@@ -86,7 +86,6 @@ The following code sample demonstrates how to update a service using the `update
 
 ```php
 ...
-
 $orders = $sap->getService('Orders');
 
 $result = $orders->update(19925, [
