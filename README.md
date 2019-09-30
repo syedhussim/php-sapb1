@@ -86,7 +86,6 @@ The following code sample demonstrates how to update a service using the `update
 
 ```php
 ...
-$sap = SAPClient::createSession($config, 'manager', 'harshal', 'TEST_SADP');
 
 $orders = $sap->getService('Orders');
 
