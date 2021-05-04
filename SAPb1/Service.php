@@ -10,6 +10,7 @@ class Service{
     private $config;
     private $session;
     private $serviceName;
+    private $headers = [];
     
     /**
      * Initializes a new instance of Service.
@@ -96,7 +97,15 @@ class Service{
      * Returns a new instance of SAPb1\Query.
      */
     public function queryBuilder() : Query{
-        return new Query($this->config, $this->session, $this->serviceName);
+        return new Query($this->config, $this->session, $this->serviceName, $this->headers);
+    }
+
+    /**
+     * Specifies request headers.
+     */
+    public function headers($headers) : Service{
+        $this->headers = $headers;
+        return $this;
     }
     
     /**
@@ -157,6 +166,7 @@ class Service{
         $request = new Request($this->config->getServiceUrl($this->serviceName) . $action, $this->config->getSSLOptions());
         $request->setMethod($method);
         $request->setCookies($this->session);
+        $request->setHeaders($this->headers);
         $request->setPost($postData);
 
         return $request->getResponse();

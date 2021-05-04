@@ -9,14 +9,16 @@ class Query{
     private $serviceName;
     private $query = [];
     private $filters = [];
+    private $headers = [];
 
     /**
      * Initializes a new instance of Query.
      */
-    public function __construct(Config $config, array $session, string $serviceName){
+    public function __construct(Config $config, array $session, string $serviceName, array $headers){
         $this->config = $config;
         $this->session = $session;
         $this->serviceName = $serviceName;
+        $this->headers = $headers;
     }
     
     /**
@@ -76,7 +78,7 @@ class Query{
     /**
      * Specifies the navigation properties to expand.
      */
-    public function expand($name){
+    public function expand($name) : Query{
         $this->query['expand'] = $name;
         return $this;
     }
@@ -135,6 +137,7 @@ class Query{
         // Execute the service API with the query string.
         $request = new Request($this->config->getServiceUrl($this->serviceName . $action) . $requestQuery, $this->config->getSSLOptions());
         $request->setMethod('GET');
+        $request->setHeaders($this->headers);
         
         // Set the SAP B1 session data.
         $request->setCookies($this->session);

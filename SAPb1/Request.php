@@ -12,6 +12,7 @@ class Request{
     protected $method = 'GET';
     protected $postParams = null;
     protected $cookies = [];
+    protected $headers = [];
     
     /**
      * Initializes a new instance of Request.
@@ -46,6 +47,14 @@ class Request{
     }
 
     /**
+     * Sets the request headers.
+     */
+    public function setHeaders(array $headers) : Request{
+        $this->headers = $headers;
+        return $this;
+    }
+
+    /**
      * Executes the request and gets the response.
      */
     public function getResponse() : Response{
@@ -61,6 +70,12 @@ class Request{
                 $header.= $name .'='. $value . ';';
             }
             $header.= "\r\n";
+        }
+
+        if(count($this->headers)){
+            foreach($this->headers as $name => $value){
+                $header.= $name .':'. $value . "\r\n";
+            }
         }
 
         $options = array( 
