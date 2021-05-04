@@ -94,4 +94,18 @@ $result = $orders->update(19925, [
 ```
 Note that the first argument to the update() method is the `id` of the entity to update. In the case of a Sales Order the `id` is the DocEntry field. If the update is successful a boolean true value is returned.
 
+### Adding Headers
+
+You can specify oData headers by calling the headers() method on a Service instance with an array of headers.
+
+```php
+...
+$orders = $sap->getService('Orders');
+$orders->headers(['Prefer' => 'odata.maxpagesize=0']);
+
+$result = $orders->queryBuilder()
+    ->select('DocEntry,DocNum')
+    ->find(123456); // DocEntry value
+```
+
 You can find more examples and the full documentation at https://syedhussim.com/sap-b1/php-sapb1-library-documentation-v1.html
