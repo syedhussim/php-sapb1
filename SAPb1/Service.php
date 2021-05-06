@@ -22,15 +22,19 @@ class Service{
     }
     
     /**
-     * Creates an entity. Returns the newly created entity on success.
+     * Creates an entity.
      * Throws SAPb1\SAPException if an error occurred.
      */
-    public function create(array $data) : object{
+    public function create(array $data){
         
         $response = $this->doRequest('POST', $data);
         
         if($response->getStatusCode() === 201){
             return $response->getJson();
+        }
+
+        if($response->getStatusCode() === 204){
+            return true;
         }
         
         throw new SAPException($response);
