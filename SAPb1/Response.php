@@ -60,6 +60,9 @@ class Response{
      * Returns the response body as an object.
      */
     public function getJson() : object{
-        return json_decode($this->body);
+        if($this->body){
+            return json_decode($this->body);
+        }
+        return new \std();
     }
 }

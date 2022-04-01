@@ -25,11 +25,15 @@ class Service{
      * Creates an entity.
      * Throws SAPb1\SAPException if an error occurred.
      */
-    public function create(array $data){
+    public function create(array $data, $returnResponse = false){
         
         $response = $this->doRequest('POST', $data);
-        
-        if($response->getStatusCode() === 201){
+
+        if($returnResponse){
+            return $response;
+        }
+
+        if(in_array($response->getStatusCode(), [200, 201])){
             return $response->getJson();
         }
 
@@ -44,13 +48,21 @@ class Service{
      * Updates an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
      */
-    public function update($id, array $data) : bool{
+    public function update($id, array $data, $returnResponse = false, $method = 'PATCH') : bool{
         
         if(is_string($id)){
             $id = "'" . str_replace("'", "''", $id) . "'";
         }
 
-        $response = $this->doRequest('PATCH', $data, '(' . $id . ')');
+        $response = $this->doRequest($method, $data, '(' . $id . ')');
+
+        if($returnResponse){
+            return $response;
+        }
+
+        if(in_array($response->getStatusCode(), [200])){
+            return $response->getJson();
+        }
 
         if($response->getStatusCode() === 204){
             return true;
@@ -63,13 +75,17 @@ class Service{
      * Deletes an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
      */
-    public function delete($id) : bool{
+    public function delete($id, $returnResponse = false) : bool{
         
         if(is_string($id)){
             $id = "'" . str_replace("'", "''", $id) . "'";
         }
 
         $response = $this->doRequest('DELETE', '(' . $id . ')');
+
+        if($returnResponse){
+            return $response;
+        }
 
         if($response->getStatusCode() === 204){
             return true;
@@ -82,13 +98,17 @@ class Service{
      * Performs an action on an entity using $id. Returns true on success.
      * Throws SAPb1\SAPException if an error occurred.
      */
-    public function action($id, string $action) : bool{
+    public function action($id, string $action, $returnResponse = false) : bool{
         
         if(is_string($id)){
             $id = "'" . str_replace("'", "''", $id) . "'";
         }
 
         $response = $this->doRequest('POST', null, '(' . $id . ')/' . $action);
+
+        if($returnResponse){
+            return $response;
+        }
 
         if($response->getStatusCode() === 204){
             return true;
