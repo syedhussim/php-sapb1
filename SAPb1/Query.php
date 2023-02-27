@@ -40,6 +40,15 @@ class Query{
     }
     
     /**
+     * Specifies how many results to skip. 
+     * Returns the current Query instance.
+     */
+    public function skip(int $skip) : Query{
+        $this->query['skip'] = $skip;
+        return $this;
+    }
+    
+    /**
      * Specifies the field to order the results by and the order direction.
      */
     public function orderBy(string $field, string $direction = 'asc') : Query{
