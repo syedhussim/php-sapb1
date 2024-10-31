@@ -1,3 +1,6 @@
+# This project is no longer in development and is now archived.
+Version 2 is now available at https://github.com/syedhussim/php-sapb1-v2
+
 # SAPb1
 A simple and easy to use PHP library for SAP Business One Service Layer API.
 
